@@ -7,7 +7,6 @@
     <style>
         :root {
             --primary-color: #17365D;
-            --border-color: # lightgray;
         }
 
         body {
@@ -99,7 +98,7 @@
         }
 
         /* Visualizaciones */
-        .canvas-container {
+        .canvas-container, .image-container {
             position: relative;
             background: #fff;
             border: 1px solid #ddd;
@@ -111,6 +110,14 @@
             max-width: 100%;
             height: auto;
             display: block;
+        }
+
+        .img-dimensiones {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
 
         /* Resultados */
@@ -136,8 +143,15 @@
     <div class="container">
         <!-- Columna Visual -->
         <div class="col-visual">
+            <!-- Diagrama dinámico con vectores -->
             <div class="canvas-container">
-                <canvas id="vanCanvas" width="1000" height="550"></canvas>
+                <canvas id="vanCanvas" width="1000" height="480"></canvas>
+            </div>
+
+            <!-- Imagen de Dimensiones de la Van -->
+            <div class="image-container">
+                <h4 style="color: #17365D; margin: 0 0 10px 0; font-size: 14px;">DIMENSIONES GENERALES</h4>
+                <img src="Dimensiones Van.png" alt="Dimensiones Van" class="img-dimensiones">
             </div>
         </div>
 
@@ -199,7 +213,7 @@
     <script>
         // Cargar imagen de la van
         const vanImg = new Image();
-        vanImg.src = 'Van Imagen.png'; // Asegúrate de tener esta imagen en la misma carpeta
+        vanImg.src = 'Van Imagen.png';
         vanImg.onload = () => calcularYDibujar();
 
         // Configuración de acordeones
@@ -224,8 +238,8 @@
         });
 
         // Coordenadas base en el canvas
-        const x1 = 186, y1 = 416;
-        const x2 = 720, y2 = 423;
+        const x1 = 186, y1 = 370;
+        const x2 = 720, y2 = 375;
         const peso_por_pasajero = 70;
         const cg_pasajeros = 1000;
         const capacidad_delantero = 1750;
@@ -290,20 +304,21 @@
             // Línea
             ctx.beginPath();
             ctx.moveTo(x, y);
-            ctx.lineTo(x, y + 50);
+            ctx.lineTo(x, y + 45);
             ctx.stroke();
 
-            // Etiqueta
+            // Etiqueta arriba
             ctx.fillStyle = "white";
-            ctx.fillRect(x - 35, y - 25, 75, 18);
+            ctx.fillRect(x - 40, y - 22, 80, 18);
             ctx.fillStyle = color;
             ctx.font = "bold 11px Arial";
-            ctx.fillText(etiqueta, x - 30, y - 12);
+            ctx.fillText(etiqueta, x - 32, y - 9);
 
+            // Etiqueta abajo (Peso)
             ctx.fillStyle = "white";
-            ctx.fillRect(x - 30, y + 55, 60, 18);
+            ctx.fillRect(x - 30, y + 48, 60, 18);
             ctx.fillStyle = color;
-            ctx.fillText(`${Math.round(peso)} kg`, x - 20, y + 68);
+            ctx.fillText(`${Math.round(peso)} kg`, x - 20, y + 61);
         }
 
         function dibujarGauge(ctx, centerX, centerY, radius, valor, titulo) {
@@ -314,7 +329,7 @@
             const drawArc = (start, end, color) => {
                 ctx.beginPath();
                 ctx.arc(0, 0, radius, start, end);
-                ctx.lineWidth = 15;
+                ctx.lineWidth = 14;
                 ctx.strokeStyle = color;
                 ctx.stroke();
             };
@@ -338,9 +353,9 @@
             ctx.fillStyle = "#17365D";
             ctx.font = "bold 11px Arial";
             ctx.textAlign = "center";
-            ctx.fillText(titulo, 0, -radius - 15);
+            ctx.fillText(titulo, 0, -radius - 12);
 
-            ctx.font = "bold 16px Arial";
+            ctx.font = "bold 15px Arial";
             ctx.fillStyle = valor >= 100 ? "red" : (valor >= 80 ? "green" : "#D9A900");
             ctx.fillText(`${Math.round(valor)}%`, 0, 15);
 
@@ -354,7 +369,7 @@
 
             // Fondo Van
             if (vanImg.complete && vanImg.naturalWidth !== 0) {
-                ctx.drawImage(vanImg, 50, 50, 750, 400);
+                ctx.drawImage(vanImg, 50, 30, 750, 400);
             }
 
             // Puntos CG
@@ -362,17 +377,17 @@
             const x_carga = mmAPixelX(cg_carga, dist_ejes);
             const x_pas = mmAPixelX(cg_pasajeros, dist_ejes);
 
-            dibujarFlecha(ctx, x_veh, 230, p_carr, "CG Vehículo", "red");
-            dibujarFlecha(ctx, x_pas, 280, p_pas, "CG Pasajeros", "blue");
-            dibujarFlecha(ctx, x_carga, 240, carga, "CG Carga", "green");
+            dibujarFlecha(ctx, x_veh, 210, p_carr, "CG Vehículo", "red");
+            dibujarFlecha(ctx, x_pas, 250, p_pas, "CG Pasajeros", "blue");
+            dibujarFlecha(ctx, x_carga, 220, carga, "CG Carga", "green");
 
             // Ejes
             dibujarFlecha(ctx, x1, y1, t_del, "Eje Delantero", "black");
             dibujarFlecha(ctx, x2, y2, t_tras, "Eje Trasero", "black");
 
             // Relojes Gauges
-            dibujarGauge(ctx, 880, 120, 50, u_del, "EJE DELANTERO");
-            dibujarGauge(ctx, 880, 280, 50, u_tras, "EJE TRASERO");
+            dibujarGauge(ctx, 880, 110, 45, u_del, "EJE DELANTERO");
+            dibujarGauge(ctx, 880, 260, 45, u_tras, "EJE TRASERO");
         }
 
         function mostrarResultadosTexto(l_tot, l_cab, a_tot, anc_tot, d_ejes, v_ant, v_post, l_bast, a_carr, p_carr, p_del, p_tras, cg_veh, n_pas, p_pas, p_pas_del, p_pas_tras, carga, cg_carga, p_carg_del, p_carg_tras, t_del, t_tras, u_del, u_tras) {
