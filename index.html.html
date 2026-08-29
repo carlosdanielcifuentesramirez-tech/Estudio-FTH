@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Cargas del Vehículo</title>
+    <style>
+        :root {
+            --primary-color: #17365D;
+            --border-color: # lightgray;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1320px;
+            margin: 0 auto;
+        }
+
+        .col-visual {
+            flex: 1.75;
+            min-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .col-control {
+            flex: 1;
+            min-width: 320px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Acordeones */
+        .accordion {
+            background-color: #eee;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 10px 15px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-top: 8px;
+            border-radius: 4px;
+        }
+
+        .active, .accordion:hover {
+            background-color: #ccc;
+        }
+
+        .panel {
+            padding: 10px;
+            display: none;
+            background-color: white;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .input-group label {
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 80px;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Visualizaciones */
+        .canvas-container {
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Resultados */
+        .results-section {
+            margin-top: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .results-section h3 {
+            color: var(--primary-color);
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 4px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ANÁLISIS DE CARGAS DEL VEHÍCULO</h1>
+
+    <div class="container">
+        <!-- Columna Visual -->
+        <div class="col-visual">
+            <div class="canvas-container">
+                <canvas id="vanCanvas" width="1000" height="550"></canvas>
+            </div>
+        </div>
+
+        <!-- Columna Controles y Resultados -->
+        <div class="col-control">
+            <h3 style="color: #17365D; margin-top:0;">PARÁMETROS DEL VEHÍCULO</h3>
+
+            <!-- Desplegable Dimensiones -->
+            <button class="accordion">▶ Dimensiones del vehículo (mm)</button>
+            <div class="panel">
+                <div class="input-group"><label>Longitud total:</label><input type="number" id="longitud_total" value="5990"></div>
+                <div class="input-group"><label>Longitud cabina:</label><input type="number" id="longitud_cabina" value="2520"></div>
+                <div class="input-group"><label>Alto total:</label><input type="number" id="alto_total" value="2645"></div>
+                <div class="input-group"><label>Ancho total:</label><input type="number" id="ancho_total" value="2098"></div>
+                <div class="input-group"><label>Distancia ejes:</label><input type="number" id="distancia_entre_ejes" value="3500"></div>
+                <div class="input-group"><label>Voladizo anterior:</label><input type="number" id="voladizo_anterior" value="990"></div>
+                <div class="input-group"><label>Voladizo posterior:</label><input type="number" id="voladizo_posterior" value="1430"></div>
+                <div class="input-group"><label>Longitud bastidor:</label><input type="number" id="longitud_sobre_bastidor" value="3470"></div>
+                <div class="input-group"><label>Alto carrocería:</label><input type="number" id="alto_carroceria" value="1930"></div>
+            </div>
+
+            <!-- Desplegable Pasajeros -->
+            <button class="accordion">▶ Pasajeros</button>
+            <div class="panel">
+                <div class="input-group">
+                    <label>Nº Pasajeros:</label>
+                    <input type="number" id="numero_pasajeros" value="2" min="0" max="20">
+                </div>
+            </div>
+
+            <!-- Desplegable Carga -->
+            <button class="accordion">▶ Carga (kg)</button>
+            <div class="panel">
+                <div class="input-group">
+                    <label>Carga:</label>
+                    <input type="range" id="carga" value="739" min="0" max="5000" step="10" oninput="this.nextElementSibling.value = this.value">
+                    <output>739</output> kg
+                </div>
+            </div>
+
+            <!-- Desplegable Carrocería -->
+            <button class="accordion">▶ Pesos Carrocería (kg)</button>
+            <div class="panel">
+                <div class="input-group">
+                    <label>Eje delantero:</label>
+                    <input type="number" id="peso_carroceria_eje_delantero" value="1395">
+                </div>
+                <div class="input-group">
+                    <label>Eje trasero:</label>
+                    <input type="number" id="peso_carroceria_eje_trasero" value="1155">
+                </div>
+            </div>
+
+            <!-- Resultados en texto -->
+            <div class="results-section" id="resultsText"></div>
+        </div>
+    </div>
+
+    <script>
+        // Cargar imagen de la van
+        const vanImg = new Image();
+        vanImg.src = 'Van Imagen.png'; // Asegúrate de tener esta imagen en la misma carpeta
+        vanImg.onload = () => calcularYDibujar();
+
+        // Configuración de acordeones
+        const acc = document.getElementsByClassName("accordion");
+        for (let i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                const panel = this.nextElementSibling;
+                if (panel.style.display === "block") {
+                    panel.style.display = "none";
+                    this.innerText = this.innerText.replace("▼", "▶");
+                } else {
+                    panel.style.display = "block";
+                    this.innerText = this.innerText.replace("▶", "▼");
+                }
+            });
+        }
+
+        // Escuchar cambios en los inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', calcularYDibujar);
+        });
+
+        // Coordenadas base en el canvas
+        const x1 = 186, y1 = 416;
+        const x2 = 720, y2 = 423;
+        const peso_por_pasajero = 70;
+        const cg_pasajeros = 1000;
+        const capacidad_delantero = 1750;
+        const capacidad_trasero = 3000;
+
+        function mmAPixelX(posicion_mm, distancia_ejes) {
+            if (distancia_ejes <= 0) return x1;
+            return x1 + (posicion_mm / distancia_ejes) * (x2 - x1);
+        }
+
+        function calcularYDibujar() {
+            // Leer valores
+            const longitud_total = parseFloat(document.getElementById('longitud_total').value) || 0;
+            const longitud_cabina = parseFloat(document.getElementById('longitud_cabina').value) || 0;
+            const alto_total = parseFloat(document.getElementById('alto_total').value) || 0;
+            const ancho_total = parseFloat(document.getElementById('ancho_total').value) || 0;
+            const distancia_ejes = parseFloat(document.getElementById('distancia_entre_ejes').value) || 1;
+            const voladizo_ant = parseFloat(document.getElementById('voladizo_anterior').value) || 0;
+            const voladizo_post = parseFloat(document.getElementById('voladizo_posterior').value) || 0;
+            const longitud_bastidor = parseFloat(document.getElementById('longitud_sobre_bastidor').value) || 0;
+            const alto_carroceria = parseFloat(document.getElementById('alto_carroceria').value) || 0;
+
+            const num_pasajeros = parseFloat(document.getElementById('numero_pasajeros').value) || 0;
+            const carga = parseFloat(document.getElementById('carga').value) || 0;
+            const peso_carr_del = parseFloat(document.getElementById('peso_carroceria_eje_delantero').value) || 0;
+            const peso_carr_tras = parseFloat(document.getElementById('peso_carroceria_eje_trasero').value) || 0;
+
+            // Cálculos
+            const cg_carga = longitud_cabina - voladizo_ant + (longitud_bastidor / 2);
+            const peso_carroceria = peso_carr_del + peso_carr_tras;
+            const cg_vehiculo = peso_carroceria > 0 ? (distancia_ejes * peso_carr_tras) / peso_carroceria : 0;
+
+            const peso_pasajeros = num_pasajeros * peso_por_pasajero;
+            const peso_pas_tras = (peso_pasajeros * cg_pasajeros) / distancia_ejes;
+            const peso_pas_del = peso_pasajeros - peso_pas_tras;
+
+            const peso_carga_tras = (carga * cg_carga) / distancia_ejes;
+            const peso_carga_del = carga - peso_carga_tras;
+
+            const total_delantero = peso_carr_del + peso_pas_del + peso_carga_del;
+            const total_trasero = peso_carr_tras + peso_pas_tras + peso_carga_tras;
+            const peso_total = peso_carroceria + peso_pasajeros + carga;
+
+            const util_del = (total_delantero / capacidad_delantero) * 100;
+            const util_tras = (total_trasero / capacidad_trasero) * 100;
+
+            // Actualizar vista
+            dibujarGrafica(cg_vehiculo, cg_carga, distancia_ejes, peso_carroceria, peso_pasajeros, carga, total_delantero, total_trasero, util_del, util_tras);
+            mostrarResultadosTexto(longitud_total, longitud_cabina, alto_total, ancho_total, distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria, peso_carroceria, peso_carr_del, peso_carr_tras, cg_vehiculo, num_pasajeros, peso_pasajeros, peso_pas_del, peso_pas_tras, carga, cg_carga, peso_carga_del, peso_carga_tras, total_delantero, total_trasero, util_del, util_tras);
+        }
+
+        function dibujarFlecha(ctx, x, y, peso, etiqueta, color) {
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+
+            // Punto CG
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Línea
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + 50);
+            ctx.stroke();
+
+            // Etiqueta
+            ctx.fillStyle = "white";
+            ctx.fillRect(x - 35, y - 25, 75, 18);
+            ctx.fillStyle = color;
+            ctx.font = "bold 11px Arial";
+            ctx.fillText(etiqueta, x - 30, y - 12);
+
+            ctx.fillStyle = "white";
+            ctx.fillRect(x - 30, y + 55, 60, 18);
+            ctx.fillStyle = color;
+            ctx.fillText(`${Math.round(peso)} kg`, x - 20, y + 68);
+        }
+
+        function dibujarGauge(ctx, centerX, centerY, radius, valor, titulo) {
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            // Arcos (Amarillo, Verde, Rojo)
+            const drawArc = (start, end, color) => {
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, start, end);
+                ctx.lineWidth = 15;
+                ctx.strokeStyle = color;
+                ctx.stroke();
+            };
+
+            drawArc(Math.PI, Math.PI * 1.66, "#D9A900");
+            drawArc(Math.PI * 1.66, Math.PI * 1.83, "green");
+            drawArc(Math.PI * 1.83, Math.PI * 2, "red");
+
+            // Aguja
+            const valLim = Math.max(0, Math.min(valor, 120));
+            const angle = Math.PI + (valLim / 120) * Math.PI;
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(Math.cos(angle) * (radius - 10), Math.sin(angle) * (radius - 10));
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#000";
+            ctx.stroke();
+
+            // Texto
+            ctx.fillStyle = "#17365D";
+            ctx.font = "bold 11px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(titulo, 0, -radius - 15);
+
+            ctx.font = "bold 16px Arial";
+            ctx.fillStyle = valor >= 100 ? "red" : (valor >= 80 ? "green" : "#D9A900");
+            ctx.fillText(`${Math.round(valor)}%`, 0, 15);
+
+            ctx.restore();
+        }
+
+        function dibujarGrafica(cg_veh, cg_carga, dist_ejes, p_carr, p_pas, carga, t_del, t_tras, u_del, u_tras) {
+            const canvas = document.getElementById('vanCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Fondo Van
+            if (vanImg.complete && vanImg.naturalWidth !== 0) {
+                ctx.drawImage(vanImg, 50, 50, 750, 400);
+            }
+
+            // Puntos CG
+            const x_veh = mmAPixelX(cg_veh, dist_ejes);
+            const x_carga = mmAPixelX(cg_carga, dist_ejes);
+            const x_pas = mmAPixelX(cg_pasajeros, dist_ejes);
+
+            dibujarFlecha(ctx, x_veh, 230, p_carr, "CG Vehículo", "red");
+            dibujarFlecha(ctx, x_pas, 280, p_pas, "CG Pasajeros", "blue");
+            dibujarFlecha(ctx, x_carga, 240, carga, "CG Carga", "green");
+
+            // Ejes
+            dibujarFlecha(ctx, x1, y1, t_del, "Eje Delantero", "black");
+            dibujarFlecha(ctx, x2, y2, t_tras, "Eje Trasero", "black");
+
+            // Relojes Gauges
+            dibujarGauge(ctx, 880, 120, 50, u_del, "EJE DELANTERO");
+            dibujarGauge(ctx, 880, 280, 50, u_tras, "EJE TRASERO");
+        }
+
+        function mostrarResultadosTexto(l_tot, l_cab, a_tot, anc_tot, d_ejes, v_ant, v_post, l_bast, a_carr, p_carr, p_del, p_tras, cg_veh, n_pas, p_pas, p_pas_del, p_pas_tras, carga, cg_carga, p_carg_del, p_carg_tras, t_del, t_tras, u_del, u_tras) {
+            document.getElementById('resultsText').innerHTML = `
+                <h3>DATOS Y RESULTADOS</h3>
+                <b>VEHÍCULO CARROZADO</b><br>
+                Peso carrocería: <b>${p_carr.toFixed(1)} kg</b><br>
+                CG vehículo carrozado: <b>${cg_veh.toFixed(1)} mm</b><br>
+
+                <h3>PASAJEROS</h3>
+                Número de pasajeros: <b>${n_pas}</b><br>
+                Peso pasajeros: <b>${p_pas.toFixed(1)} kg</b><br>
+
+                <h3>CARGA</h3>
+                Carga: <b>${carga.toFixed(1)} kg</b><br>
+                CG carga: <b>${cg_carga.toFixed(1)} mm</b><br>
+
+                <h3>EJES Y UTILIZACIÓN</h3>
+                Peso total eje delantero: <b>${t_del.toFixed(1)} kg</b> (${u_del.toFixed(1)}%)<br>
+                Peso total eje trasero: <b>${t_tras.toFixed(1)} kg</b> (${u_tras.toFixed(1)}%)
+            `;
+        }
+    </script>
+</body>
+</html>
