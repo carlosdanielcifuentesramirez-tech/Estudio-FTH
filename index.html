@@ -248,7 +248,7 @@
         const capacidad_delantero = 1750;
         const capacidad_trasero = 3000;
 
-        // POSICIONES DE TEXTO SOBRE "DIMENSIONES VAN" (Misma lógica de Python)
+        // POSICIONES DE TEXTO SOBRE "DIMENSIONES VAN"
         const POS_DIMENSIONES = {
             longitud_total: { x: 485, y: 299 },
             longitud_cabina: { x: 360, y: 22 },
@@ -310,6 +310,15 @@
             mostrarResultadosTexto(longitud_total, longitud_cabina, alto_total, ancho_total, distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria, peso_carroceria, peso_carr_del, peso_carr_tras, cg_vehiculo, num_pasajeros, peso_pasajeros, peso_pas_del, peso_pas_tras, carga, cg_carga, peso_carga_del, peso_carga_tras, total_delantero, total_trasero, util_del, util_tras);
         }
 
+        // Función para dibujar texto rotado 90 grados a la izquierda (-90 deg)
+        function dibujarTextoRotado(ctx, texto, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(-Math.PI / 2); // Rotación de 90° a la izquierda
+            ctx.fillText(texto, 0, 0);
+            ctx.restore();
+        }
+
         function dibujarDimensionesOverlay(dims) {
             const canvas = document.getElementById('dimCanvas');
             const ctx = canvas.getContext('2d');
@@ -324,16 +333,18 @@
             ctx.fillStyle = "#00008B"; // Azul oscuro corporativo
             ctx.textAlign = "center";
 
-            // Dibujar cada cota en sus coordenadas (X, Y)
+            // Dibujar cotas horizontales simples
             ctx.fillText(`${dims.longitud_total} mm`, POS_DIMENSIONES.longitud_total.x, POS_DIMENSIONES.longitud_total.y);
             ctx.fillText(`${dims.longitud_cabina} mm`, POS_DIMENSIONES.longitud_cabina.x, POS_DIMENSIONES.longitud_cabina.y);
-            ctx.fillText(`${dims.alto_total} mm`, POS_DIMENSIONES.alto_total.x, POS_DIMENSIONES.alto_total.y);
             ctx.fillText(`${dims.ancho_total} mm`, POS_DIMENSIONES.ancho_total.x, POS_DIMENSIONES.ancho_total.y);
             ctx.fillText(`${dims.distancia_ejes} mm`, POS_DIMENSIONES.distancia_ejes.x, POS_DIMENSIONES.distancia_ejes.y);
             ctx.fillText(`${dims.voladizo_ant} mm`, POS_DIMENSIONES.voladizo_anterior.x, POS_DIMENSIONES.voladizo_anterior.y);
             ctx.fillText(`${dims.voladizo_post} mm`, POS_DIMENSIONES.voladizo_posterior.x, POS_DIMENSIONES.voladizo_posterior.y);
             ctx.fillText(`${dims.longitud_bastidor} mm`, POS_DIMENSIONES.longitud_bastidor.x, POS_DIMENSIONES.longitud_bastidor.y);
-            ctx.fillText(`${dims.alto_carroceria} mm`, POS_DIMENSIONES.alto_carroceria.x, POS_DIMENSIONES.alto_carroceria.y);
+
+            // Dibujar cotas verticales rotadas 90° a la izquierda
+            dibujarTextoRotado(ctx, `${dims.alto_total} mm`, POS_DIMENSIONES.alto_total.x, POS_DIMENSIONES.alto_total.y);
+            dibujarTextoRotado(ctx, `${dims.alto_carroceria} mm`, POS_DIMENSIONES.alto_carroceria.x, POS_DIMENSIONES.alto_carroceria.y);
         }
 
         function dibujarFlecha(ctx, x, y, peso, etiqueta, color) {
