@@ -135,15 +135,15 @@
     <div class="container">
         <!-- Columna Visual -->
         <div class="col-visual">
-            <!-- Canvas de Dimensiones (AHORA ARRIBA) -->
+            <!-- Canvas de Dimensiones (Arriba) -->
             <div class="canvas-container">
                 <h4 style="color: #17365D; margin: 0 0 10px 0; font-size: 14px;">DIMENSIONES GENERALES</h4>
                 <canvas id="dimCanvas" width="800" height="320"></canvas>
             </div>
 
-            <!-- Diagrama dinámico con vectores (AHORA ABAJO) -->
+            <!-- Diagrama dinámico con vectores (Abajo) -->
             <div class="canvas-container">
-                <canvas id="vanCanvas" width="1000" height="480"></canvas>
+                <canvas id="vanCanvas" width="1000" height="420"></canvas>
             </div>
         </div>
 
@@ -240,9 +240,9 @@
             input.addEventListener('input', calcularYDibujar);
         });
 
-        // Coordenadas base para los pesos
-        const x1 = 186, y1 = 370;
-        const x2 = 720, y2 = 375;
+        // Coordenadas base para las ruedas/ejes (ajustadas al canvas proporcional)
+        const x1 = 186, y1 = 320;
+        const x2 = 720, y2 = 320;
         const peso_por_pasajero = 70;
         const cg_pasajeros = 1000;
         const capacidad_delantero = 1750;
@@ -421,16 +421,23 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (vanImg.complete && vanImg.naturalWidth !== 0) {
-                ctx.drawImage(vanImg, 50, 30, 750, 400);
+                // Mantiene el aspect ratio original de la imagen
+                const maxAncho = 750;
+                const relacionAspecto = vanImg.naturalWidth / vanImg.naturalHeight;
+                const anchoDibujo = maxAncho;
+                const altoDibujo = maxAncho / relacionAspecto;
+
+                ctx.drawImage(vanImg, 50, 40, anchoDibujo, altoDibujo);
             }
 
             const x_veh = mmAPixelX(cg_veh, dist_ejes);
             const x_carga = mmAPixelX(cg_carga, dist_ejes);
             const x_pas = mmAPixelX(cg_pasajeros, dist_ejes);
 
-            dibujarFlecha(ctx, x_veh, 210, p_carr, "CG Vehículo", "red");
-            dibujarFlecha(ctx, x_pas, 250, p_pas, "CG Pasajeros", "blue");
-            dibujarFlecha(ctx, x_carga, 220, carga, "CG Carga", "green");
+            // Coordenadas de flechas adaptadas a la nueva escala vertical
+            dibujarFlecha(ctx, x_veh, 160, p_carr, "CG Vehículo", "red");
+            dibujarFlecha(ctx, x_pas, 200, p_pas, "CG Pasajeros", "blue");
+            dibujarFlecha(ctx, x_carga, 175, carga, "CG Carga", "green");
 
             dibujarFlecha(ctx, x1, y1, t_del, "Eje Delantero", "black");
             dibujarFlecha(ctx, x2, y2, t_tras, "Eje Trasero", "black");
