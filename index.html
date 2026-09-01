@@ -155,14 +155,14 @@
             background-color: #f2f2f2;
         }
 
-        /* Resultados */
-        .results-section {
+        /* Centros de Gravedad */
+        .cg-section {
             margin-top: 20px;
             font-size: 13px;
-            line-height: 1.6;
+            line-height: 1.8;
         }
 
-        .results-section h3 {
+        .cg-section h3 {
             color: var(--primary-color);
             border-bottom: 1px solid #ddd;
             padding-bottom: 4px;
@@ -292,8 +292,8 @@
                 </div>
             </div>
 
-            <!-- Resultados en texto -->
-            <div class="results-section" id="resultsText"></div>
+            <!-- Centros de Gravedad -->
+            <div class="cg-section" id="cgSection"></div>
         </div>
     </div>
 
@@ -399,14 +399,14 @@
             const util_del = (total_delantero / capacidad_delantero) * 100;
             const util_tras = (total_trasero / capacidad_trasero) * 100;
 
-            // Actualizar gráficos, tabla y textos
+            // Actualizar gráficos, tabla y sección de CG
             dibujarGraficaPesos(cg_vehiculo, cg_carga, distancia_ejes, peso_carroceria, peso_pasajeros, carga, total_delantero, total_trasero, util_del, util_tras);
             dibujarDimensionesOverlay({
                 longitud_total, longitud_cabina, alto_total, ancho_total,
                 distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria
             });
             actualizarTablaResumen(peso_carr_del, peso_carr_tras, peso_carroceria, peso_carga_del, peso_carga_tras, carga, peso_pas_del, peso_pas_tras, peso_pasajeros, total_delantero, total_trasero);
-            mostrarResultadosTexto(longitud_total, longitud_cabina, alto_total, ancho_total, distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria, peso_carroceria, peso_carr_del, peso_carr_tras, cg_vehiculo, num_pasajeros, peso_pasajeros, peso_pas_del, peso_pas_tras, carga, cg_carga, peso_carga_del, peso_carga_tras, total_delantero, total_trasero, util_del, util_tras, capacidad_delantero, capacidad_trasero);
+            mostrarCentrosGravedad(cg_vehiculo, cg_carga);
         }
 
         function actualizarTablaResumen(vDel, vTras, vTot, cDel, cTras, cTot, pDel, pTras, pTot, tDel, tTras) {
@@ -598,24 +598,11 @@
             dibujarGauge(ctx, 880, 260, 45, u_tras, "EJE TRASERO");
         }
 
-        function mostrarResultadosTexto(l_tot, l_cab, a_tot, anc_tot, d_ejes, v_ant, v_post, l_bast, a_carr, p_carr, p_del, p_tras, cg_veh, n_pas, p_pas, p_pas_del, p_pas_tras, carga, cg_carga, p_carg_del, p_carg_tras, t_del, t_tras, u_del, u_tras, cap_del, cap_tras) {
-            document.getElementById('resultsText').innerHTML = `
-                <h3>DATOS Y RESULTADOS</h3>
-                <b>VEHÍCULO CARROZADO</b><br>
-                Peso carrocería: <b>${p_carr.toFixed(1)} kg</b><br>
+        function mostrarCentrosGravedad(cg_veh, cg_carga) {
+            document.getElementById('cgSection').innerHTML = `
+                <h3>CENTROS DE GRAVEDAD</h3>
                 CG vehículo carrozado: <b>${cg_veh.toFixed(1)} mm</b><br>
-
-                <h3>PASAJEROS</h3>
-                Número de pasajeros: <b>${n_pas}</b><br>
-                Peso pasajeros: <b>${p_pas.toFixed(1)} kg</b><br>
-
-                <h3>CARGA</h3>
-                Carga: <b>${carga.toFixed(1)} kg</b><br>
-                CG carga: <b>${cg_carga.toFixed(1)} mm</b><br>
-
-                <h3>EJES Y UTILIZACIÓN</h3>
-                Eje Delantero: <b>${t_del.toFixed(1)} kg / ${cap_del} kg</b> (${u_del.toFixed(1)}%)<br>
-                Eje Trasero: <b>${t_tras.toFixed(1)} kg / ${cap_tras} kg</b> (${u_tras.toFixed(1)}%)
+                CG carga: <b>${cg_carga.toFixed(1)} mm</b>
             `;
         }
     </script>
