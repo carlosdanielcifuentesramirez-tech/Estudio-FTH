@@ -578,7 +578,7 @@
 
             // Fondo blanco superior para la etiqueta (ampliado para texto de 15px)
             ctx.fillStyle = "white";
-            ctx.fillRect(x - 50, y - 28, 100, 24);
+            ctx.fillRect(x - 55, y - 28, 110, 24);
             ctx.fillStyle = color;
             ctx.font = "bold 15px Arial";
             ctx.textAlign = "center";
@@ -586,7 +586,7 @@
 
             // Fondo blanco inferior para el peso en kg (ampliado para texto de 15px)
             ctx.fillStyle = "white";
-            ctx.fillRect(x - 50, yFin + 8, 100, 24);
+            ctx.fillRect(x - 40, yFin + 8, 80, 24);
             ctx.fillStyle = color;
             ctx.font = "bold 15px Arial";
             ctx.fillText(`${Math.round(peso)} kg`, x, yFin + 25);
