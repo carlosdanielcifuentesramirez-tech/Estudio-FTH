@@ -18,6 +18,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
+            padding-bottom: 80px; /* Espacio para no tapar contenido con el botón flotante */
             background-color: #f8f9fa;
             color: #333;
         }
@@ -25,7 +26,21 @@
         h1 {
             color: var(--primary-color);
             font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* Banner con el Nombre del Vehículo */
+        .vehiculo-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
             margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .container {
@@ -53,23 +68,60 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Botón de exportación */
-        .btn-pdf {
-            width: 100%;
+        /* Campo Nombre del Vehículo */
+        .input-vehiculo-container {
+            background-color: #eef3f9;
+            border: 1px solid #b8cce4;
             padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .input-vehiculo-container label {
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .input-vehiculo-container input {
+            width: 95%;
+            padding: 8px;
+            border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
             font-weight: bold;
+        }
+
+        /* Botón Guardar Resultados (Inferior Derecha) */
+        .floating-btn-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .btn-pdf {
+            padding: 14px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: bold;
             cursor: pointer;
-            margin-bottom: 15px;
-            transition: background-color 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-pdf:hover {
             background-color: #0e233d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.4);
         }
 
         /* Acordeones */
@@ -199,9 +251,14 @@
 
     <h1>ANÁLISIS DE CARGAS DEL VEHÍCULO</h1>
 
-    <div class="container">
+    <div class="container" id="reporteContainer">
         <!-- Columna Visual -->
         <div class="col-visual">
+            <!-- Header dinámico con nombre de vehículo -->
+            <div class="vehiculo-header">
+                VEHÍCULO: <span id="nombreVehiculoDisplay">SIN NOMBRE</span>
+            </div>
+
             <!-- Canvas de Dimensiones (Arriba) -->
             <div class="canvas-container">
                 <h4 style="color: #17365D; margin: 0 0 10px 0; font-size: 14px;">DIMENSIONES GENERALES</h4>
@@ -256,8 +313,11 @@
 
         <!-- Columna Controles y Resultados -->
         <div class="col-control">
-            <!-- BOTÓN GENERAR INFORME -->
-            <button id="btnGenerarPDF" class="btn-pdf" onclick="generarInformePDF()">📄 Generar Informe PDF</button>
+            <!-- CAMPO NOMBRE DEL VEHÍCULO -->
+            <div class="input-vehiculo-container">
+                <label for="nombre_vehiculo">Nombre del Vehículo *</label>
+                <input type="text" id="nombre_vehiculo" placeholder="Ej: Camión FTR 1200 - Flota 01" autocomplete="off">
+            </div>
 
             <h3 style="color: #17365D; margin-top:0;">PARÁMETROS DEL VEHÍCULO</h3>
 
@@ -324,6 +384,13 @@
         </div>
     </div>
 
+    <!-- BOTÓN FLOTANTE INFERIOR DERECHO -->
+    <div class="floating-btn-container">
+        <button id="btnGuardarResultados" class="btn-pdf" onclick="generarInformePDF()">
+            💾 Guardar Resultados
+        </button>
+    </div>
+
     <script>
         // Cargar imágenes
         const vanImg = new Image();
@@ -357,6 +424,15 @@
             });
         }
 
+        // Actualizar el nombre del vehículo en tiempo real en la vista
+        const inputNombre = document.getElementById('nombre_vehiculo');
+        const displayNombre = document.getElementById('nombreVehiculoDisplay');
+
+        inputNombre.addEventListener('input', () => {
+            const val = inputNombre.value.trim();
+            displayNombre.innerText = val !== "" ? val.toUpperCase() : "SIN NOMBRE";
+        });
+
         // Escuchar cambios en los inputs
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', calcularYDibujar);
@@ -368,7 +444,6 @@
         const peso_por_pasajero = 70;
         const cg_pasajeros = 1000;
 
-        // POSICIONES DE TEXTO SOBRE "DIMENSIONES VAN"
         const POS_DIMENSIONES = {
             longitud_total: { x: 485, y: 299 },
             longitud_cabina: { x: 360, y: 22 },
@@ -387,7 +462,6 @@
         }
 
         function calcularYDibujar() {
-            // Leer valores de dimensiones
             const longitud_total = parseFloat(document.getElementById('longitud_total').value) || 0;
             const longitud_cabina = parseFloat(document.getElementById('longitud_cabina').value) || 0;
             const alto_total = parseFloat(document.getElementById('alto_total').value) || 0;
@@ -398,17 +472,14 @@
             const longitud_bastidor = parseFloat(document.getElementById('longitud_sobre_bastidor').value) || 0;
             const alto_carroceria = parseFloat(document.getElementById('alto_carroceria').value) || 0;
 
-            // Leer valores de pasajeros, carga y carrocería
             const num_pasajeros = parseFloat(document.getElementById('numero_pasajeros').value) || 0;
             const carga = parseFloat(document.getElementById('carga').value) || 0;
             const peso_carr_del = parseFloat(document.getElementById('peso_carroceria_eje_delantero').value) || 0;
             const peso_carr_tras = parseFloat(document.getElementById('peso_carroceria_eje_trasero').value) || 0;
 
-            // Leer capacidades de ejes
             const capacidad_delantero = parseFloat(document.getElementById('capacidad_eje_delantero').value) || 1;
             const capacidad_trasero = parseFloat(document.getElementById('capacidad_eje_trasero').value) || 1;
 
-            // Cálculos
             const cg_carga = longitud_cabina - voladizo_ant + (longitud_bastidor / 2);
             const peso_carroceria = peso_carr_del + peso_carr_tras;
             const cg_vehiculo = peso_carroceria > 0 ? (distancia_ejes * peso_carr_tras) / peso_carroceria : 0;
@@ -426,7 +497,6 @@
             const util_del = (total_delantero / capacidad_delantero) * 100;
             const util_tras = (total_trasero / capacidad_trasero) * 100;
 
-            // Actualizar gráficos, tabla y sección de CG
             dibujarGraficaPesos(cg_vehiculo, cg_carga, distancia_ejes, peso_carroceria, peso_pasajeros, carga, total_delantero, total_trasero, util_del, util_tras);
             dibujarDimensionesOverlay({
                 longitud_total, longitud_cabina, alto_total, ancho_total,
@@ -492,7 +562,6 @@
             const yFin = y + largoLinea;
             const tamanoPunta = 8;
 
-            // Capa de borde blanco
             ctx.fillStyle = "white";
             ctx.strokeStyle = "white";
 
@@ -515,7 +584,6 @@
             ctx.stroke();
             ctx.fill();
 
-            // Capa principal (Color)
             ctx.fillStyle = color;
             ctx.strokeStyle = color;
 
@@ -536,7 +604,6 @@
             ctx.closePath();
             ctx.fill();
 
-            // Etiquetas de texto
             ctx.fillStyle = "white";
             ctx.fillRect(x - 45, y - 22, 90, 18);
             ctx.fillStyle = color;
@@ -625,12 +692,21 @@
             `;
         }
 
-        // FUNCIÓN PARA GENERAR EL INFORME PDF CON PESTAÑAS DESPLEGADAS
+        // FUNCIÓN GUARDAR RESULTADOS (GENERAR PDF)
         async function generarInformePDF() {
+            const nombreVehiculo = document.getElementById('nombre_vehiculo').value.trim();
+
+            // Validación de campo obligatorio
+            if (!nombreVehiculo) {
+                alert("pon nombre al vehiculo");
+                document.getElementById('nombre_vehiculo').focus();
+                return;
+            }
+
             const { jsPDF } = window.jspdf;
-            const btn = document.getElementById('btnGenerarPDF');
+            const btn = document.getElementById('btnGuardarResultados');
             
-            // Guardar el estado original y desplegar todos los paneles
+            // Guardar estado original y desplegar acordeones
             const acordeones = document.querySelectorAll('.accordion');
             const paneles = document.querySelectorAll('.panel');
             const estadosOriginales = [];
@@ -644,14 +720,13 @@
                 accItem.innerText = accItem.innerText.replace("▶", "▼");
             });
 
-            btn.innerText = "⏳ Generando PDF...";
+            btn.innerText = "⏳ Guardando...";
             btn.disabled = true;
 
-            // Esperar un instante a que el navegador aplique los cambios visuales
             await new Promise(resolve => setTimeout(resolve, 300));
 
             try {
-                const elemento = document.querySelector('.container');
+                const elemento = document.getElementById('reporteContainer');
                 const canvas = await html2canvas(elemento, {
                     scale: 2,
                     useCORS: true,
@@ -676,13 +751,15 @@
                     heightLeft -= pageHeight;
                 }
 
-                pdf.save(`Informe_Cargas_${new Date().toISOString().slice(0,10)}.pdf`);
+                // Generar nombre de archivo dinámico
+                const nombreLimpio = nombreVehiculo.replace(/[^a-zA-Z0-9_-]/g, "_");
+                pdf.save(`Informe_${nombreLimpio}_${new Date().toISOString().slice(0,10)}.pdf`);
 
             } catch (error) {
                 console.error("Error al generar el PDF:", error);
-                alert("Ocurrió un error al intentar generar el PDF.");
+                alert("Ocurrió un error al intentar guardar los resultados.");
             } finally {
-                // Restaurar estado previo de la interfaz
+                // Restaurar estado de acordeones
                 acordeones.forEach((accItem, index) => {
                     const panel = paneles[index];
                     panel.style.display = estadosOriginales[index];
@@ -692,7 +769,7 @@
                     }
                 });
 
-                btn.innerText = "📄 Generar Informe PDF";
+                btn.innerText = "💾 Guardar Resultados";
                 btn.disabled = false;
             }
         }
