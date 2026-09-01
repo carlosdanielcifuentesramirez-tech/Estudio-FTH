@@ -576,17 +576,20 @@
             ctx.closePath();
             ctx.fill();
 
+            // Fondo blanco superior para la etiqueta (ampliado para texto de 15px)
             ctx.fillStyle = "white";
-            ctx.fillRect(x - 45, y - 22, 90, 18);
+            ctx.fillRect(x - 65, y - 28, 130, 24);
             ctx.fillStyle = color;
-            ctx.font = "bold 11px Arial";
+            ctx.font = "bold 15px Arial";
             ctx.textAlign = "center";
-            ctx.fillText(etiqueta, x, y - 9);
+            ctx.fillText(etiqueta, x, y - 10);
 
+            // Fondo blanco inferior para el peso en kg (ampliado para texto de 15px)
             ctx.fillStyle = "white";
-            ctx.fillRect(x - 35, yFin + 8, 70, 18);
+            ctx.fillRect(x - 50, yFin + 8, 100, 24);
             ctx.fillStyle = color;
-            ctx.fillText(`${Math.round(peso)} kg`, x, yFin + 21);
+            ctx.font = "bold 15px Arial";
+            ctx.fillText(`${Math.round(peso)} kg`, x, yFin + 25);
         }
 
         function dibujarGauge(ctx, centerX, centerY, radius, valor, titulo) {
@@ -616,11 +619,11 @@
             ctx.stroke();
 
             ctx.fillStyle = "#17365D";
-            ctx.font = "bold 11px Arial";
+            ctx.font = "bold 12px Arial";
             ctx.textAlign = "center";
             ctx.fillText(titulo, 0, -radius - 12);
 
-            ctx.font = "bold 15px Arial";
+            ctx.font = "bold 16px Arial";
             ctx.fillStyle = valor >= 100 ? "red" : (valor >= 80 ? "green" : "#D9A900");
             ctx.fillText(`${Math.round(valor)}%`, 0, 15);
 
