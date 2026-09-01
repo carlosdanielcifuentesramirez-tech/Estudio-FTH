@@ -54,7 +54,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Campo Nombre del Vehículo */
+        /* Campo Referencia */
         .input-vehiculo-container {
             background-color: #eef3f9;
             border: 1px solid #b8cce4;
@@ -294,9 +294,9 @@
 
         <!-- Columna Controles y Resultados -->
         <div class="col-control">
-            <!-- CAMPO NOMBRE DEL VEHÍCULO -->
+            <!-- CAMPO REFERENCIA -->
             <div class="input-vehiculo-container">
-                <label for="nombre_vehiculo">Nombre del Vehículo</label>
+                <label for="nombre_vehiculo">Referencia</label>
                 <input type="text" id="nombre_vehiculo" autocomplete="off">
             </div>
 
@@ -673,7 +673,7 @@
 
             // Validación de campo obligatorio
             if (!nombreVehiculo) {
-                alert("pon nombre al vehiculo");
+                alert("Por favor ingrese la Referencia");
                 document.getElementById('nombre_vehiculo').focus();
                 return;
             }
