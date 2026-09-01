@@ -26,21 +26,7 @@
         h1 {
             color: var(--primary-color);
             font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        /* Banner con el Nombre del Vehículo */
-        .vehiculo-header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 6px;
             margin-bottom: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .container {
@@ -254,11 +240,6 @@
     <div class="container" id="reporteContainer">
         <!-- Columna Visual -->
         <div class="col-visual">
-            <!-- Header dinámico con nombre de vehículo -->
-            <div class="vehiculo-header">
-                VEHÍCULO: <span id="nombreVehiculoDisplay">SIN NOMBRE</span>
-            </div>
-
             <!-- Canvas de Dimensiones (Arriba) -->
             <div class="canvas-container">
                 <h4 style="color: #17365D; margin: 0 0 10px 0; font-size: 14px;">DIMENSIONES GENERALES</h4>
@@ -315,8 +296,8 @@
         <div class="col-control">
             <!-- CAMPO NOMBRE DEL VEHÍCULO -->
             <div class="input-vehiculo-container">
-                <label for="nombre_vehiculo">Nombre del Vehículo *</label>
-                <input type="text" id="nombre_vehiculo" placeholder="Ej: Camión FTR 1200 - Flota 01" autocomplete="off">
+                <label for="nombre_vehiculo">Nombre del Vehículo</label>
+                <input type="text" id="nombre_vehiculo" autocomplete="off">
             </div>
 
             <h3 style="color: #17365D; margin-top:0;">PARÁMETROS DEL VEHÍCULO</h3>
@@ -423,15 +404,6 @@
                 }
             });
         }
-
-        // Actualizar el nombre del vehículo en tiempo real en la vista
-        const inputNombre = document.getElementById('nombre_vehiculo');
-        const displayNombre = document.getElementById('nombreVehiculoDisplay');
-
-        inputNombre.addEventListener('input', () => {
-            const val = inputNombre.value.trim();
-            displayNombre.innerText = val !== "" ? val.toUpperCase() : "SIN NOMBRE";
-        });
 
         // Escuchar cambios en los inputs
         document.querySelectorAll('input').forEach(input => {
