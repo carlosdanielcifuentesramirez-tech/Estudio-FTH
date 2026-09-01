@@ -112,6 +112,49 @@
             display: block;
         }
 
+        /* Tabla de Resumen de Cargas */
+        .tabla-cargas-container {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .tabla-cargas {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .tabla-cargas th {
+            background-color: #E6EEF8;
+            color: #000;
+            padding: 8px;
+            border: 1px solid #ccc;
+            font-weight: bold;
+        }
+
+        .tabla-cargas td {
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+        }
+
+        .tabla-cargas tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .tabla-cargas td.col-titulo {
+            font-weight: bold;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+
+        .tabla-cargas tr.fila-total td {
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+
         /* Resultados */
         .results-section {
             margin-top: 20px;
@@ -144,6 +187,46 @@
             <!-- Diagrama dinámico con vectores (Abajo) -->
             <div class="canvas-container">
                 <canvas id="vanCanvas" width="1000" height="420"></canvas>
+            </div>
+
+            <!-- TABLA RESUMEN DE PESOS Y DISTRIBUCIÓN -->
+            <div class="tabla-cargas-container">
+                <table class="tabla-cargas">
+                    <thead>
+                        <tr>
+                            <th>Peso</th>
+                            <th>Eje Delantero</th>
+                            <th>Eje Trasero</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col-titulo">Vehículo</td>
+                            <td id="tb_veh_del">0 kg</td>
+                            <td id="tb_veh_tras">0 kg</td>
+                            <td id="tb_veh_tot">0 kg</td>
+                        </tr>
+                        <tr>
+                            <td class="col-titulo">Carga</td>
+                            <td id="tb_carga_del">0 kg</td>
+                            <td id="tb_carga_tras">0 kg</td>
+                            <td id="tb_carga_tot">0 kg</td>
+                        </tr>
+                        <tr>
+                            <td class="col-titulo">Pasajeros</td>
+                            <td id="tb_pas_del">0 kg</td>
+                            <td id="tb_pas_tras">0 kg</td>
+                            <td id="tb_pas_tot">0 kg</td>
+                        </tr>
+                        <tr class="fila-total">
+                            <td class="col-titulo">Total</td>
+                            <td id="tb_tot_del">0 kg</td>
+                            <td id="tb_tot_tras">0 kg</td>
+                            <td id="tb_tot_gen">0 kg</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -196,7 +279,7 @@
                 </div>
             </div>
 
-            <!-- NUEVO DESPLEGABLE: Ejes (Capacidades) -->
+            <!-- Desplegable Ejes (Capacidades) -->
             <button class="accordion">▶ Ejes (Capacidades) (kg)</button>
             <div class="panel">
                 <div class="input-group">
@@ -294,7 +377,7 @@
             const peso_carr_del = parseFloat(document.getElementById('peso_carroceria_eje_delantero').value) || 0;
             const peso_carr_tras = parseFloat(document.getElementById('peso_carroceria_eje_trasero').value) || 0;
 
-            // Leer capacidades de ejes desde la interfaz
+            // Leer capacidades de ejes
             const capacidad_delantero = parseFloat(document.getElementById('capacidad_eje_delantero').value) || 1;
             const capacidad_trasero = parseFloat(document.getElementById('capacidad_eje_trasero').value) || 1;
 
@@ -316,13 +399,32 @@
             const util_del = (total_delantero / capacidad_delantero) * 100;
             const util_tras = (total_trasero / capacidad_trasero) * 100;
 
-            // Actualizar gráficos y textos
+            // Actualizar gráficos, tabla y textos
             dibujarGraficaPesos(cg_vehiculo, cg_carga, distancia_ejes, peso_carroceria, peso_pasajeros, carga, total_delantero, total_trasero, util_del, util_tras);
             dibujarDimensionesOverlay({
                 longitud_total, longitud_cabina, alto_total, ancho_total,
                 distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria
             });
+            actualizarTablaResumen(peso_carr_del, peso_carr_tras, peso_carroceria, peso_carga_del, peso_carga_tras, carga, peso_pas_del, peso_pas_tras, peso_pasajeros, total_delantero, total_trasero);
             mostrarResultadosTexto(longitud_total, longitud_cabina, alto_total, ancho_total, distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria, peso_carroceria, peso_carr_del, peso_carr_tras, cg_vehiculo, num_pasajeros, peso_pasajeros, peso_pas_del, peso_pas_tras, carga, cg_carga, peso_carga_del, peso_carga_tras, total_delantero, total_trasero, util_del, util_tras, capacidad_delantero, capacidad_trasero);
+        }
+
+        function actualizarTablaResumen(vDel, vTras, vTot, cDel, cTras, cTot, pDel, pTras, pTot, tDel, tTras) {
+            document.getElementById('tb_veh_del').innerText = `${Math.round(vDel)} kg`;
+            document.getElementById('tb_veh_tras').innerText = `${Math.round(vTras)} kg`;
+            document.getElementById('tb_veh_tot').innerText = `${Math.round(vTot)} kg`;
+
+            document.getElementById('tb_carga_del').innerText = `${Math.round(cDel)} kg`;
+            document.getElementById('tb_carga_tras').innerText = `${Math.round(cTras)} kg`;
+            document.getElementById('tb_carga_tot').innerText = `${Math.round(cTot)} kg`;
+
+            document.getElementById('tb_pas_del').innerText = `${Math.round(pDel)} kg`;
+            document.getElementById('tb_pas_tras').innerText = `${Math.round(pTras)} kg`;
+            document.getElementById('tb_pas_tot').innerText = `${Math.round(pTot)} kg`;
+
+            document.getElementById('tb_tot_del').innerText = `${Math.round(tDel)} kg`;
+            document.getElementById('tb_tot_tras').innerText = `${Math.round(tTras)} kg`;
+            document.getElementById('tb_tot_gen').innerText = `${Math.round(tDel + tTras)} kg`;
         }
 
         function dibujarTextoRotado(ctx, texto, x, y) {
