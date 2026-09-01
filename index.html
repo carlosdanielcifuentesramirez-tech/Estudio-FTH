@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análisis de Cargas del Vehículo</title>
+    
+    <!-- Librerías para exportar a PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         :root {
             --primary-color: #17365D;
@@ -46,6 +51,25 @@
             padding: 15px;
             border-radius: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Botón de exportación */
+        .btn-pdf {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-pdf:hover {
+            background-color: #0e233d;
         }
 
         /* Acordeones */
@@ -232,6 +256,9 @@
 
         <!-- Columna Controles y Resultados -->
         <div class="col-control">
+            <!-- BOTÓN GENERAR INFORME -->
+            <button id="btnGenerarPDF" class="btn-pdf" onclick="generarInformePDF()">📄 Generar Informe PDF</button>
+
             <h3 style="color: #17365D; margin-top:0;">PARÁMETROS DEL VEHÍCULO</h3>
 
             <!-- Desplegable Dimensiones -->
@@ -283,7 +310,7 @@
                 </div>
             </div>
 
-            <!-- Desplegable Carga (Ahora al final) -->
+            <!-- Desplegable Carga -->
             <button class="accordion">▶ Carga (kg)</button>
             <div class="panel">
                 <div class="input-group">
@@ -465,23 +492,20 @@
             const yFin = y + largoLinea;
             const tamanoPunta = 8;
 
-            // --- 1. CAPA DE BORDE BLANCO ---
+            // Capa de borde blanco
             ctx.fillStyle = "white";
             ctx.strokeStyle = "white";
 
-            // Borde de la línea vertical
             ctx.lineWidth = 7;
             ctx.beginPath();
             ctx.moveTo(x, y);
             ctx.lineTo(x, yFin);
             ctx.stroke();
 
-            // Borde del punto de origen
             ctx.beginPath();
             ctx.arc(x, y, 7, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Borde de la punta de la flecha
             ctx.lineWidth = 4;
             ctx.beginPath();
             ctx.moveTo(x, yFin + 6);
@@ -491,23 +515,20 @@
             ctx.stroke();
             ctx.fill();
 
-            // --- 2. CAPA PRINCIPAL (COLOR) ---
+            // Capa principal (Color)
             ctx.fillStyle = color;
             ctx.strokeStyle = color;
 
-            // Punto de origen
             ctx.beginPath();
             ctx.arc(x, y, 5, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Línea vertical
             ctx.lineWidth = 3;
             ctx.beginPath();
             ctx.moveTo(x, y);
             ctx.lineTo(x, yFin);
             ctx.stroke();
 
-            // Punta de la flecha
             ctx.beginPath();
             ctx.moveTo(x, yFin + 4);
             ctx.lineTo(x - tamanoPunta, yFin - tamanoPunta);
@@ -515,8 +536,7 @@
             ctx.closePath();
             ctx.fill();
 
-            // --- 3. ETIQUETAS DE TEXTO ---
-            // Etiqueta superior (Nombre)
+            // Etiquetas de texto
             ctx.fillStyle = "white";
             ctx.fillRect(x - 45, y - 22, 90, 18);
             ctx.fillStyle = color;
@@ -524,7 +544,6 @@
             ctx.textAlign = "center";
             ctx.fillText(etiqueta, x, y - 9);
 
-            // Etiqueta inferior (Valor en kg)
             ctx.fillStyle = "white";
             ctx.fillRect(x - 35, yFin + 8, 70, 18);
             ctx.fillStyle = color;
@@ -604,6 +623,78 @@
                 CG vehículo carrozado: <b>${cg_veh.toFixed(1)} mm</b><br>
                 CG carga: <b>${cg_carga.toFixed(1)} mm</b>
             `;
+        }
+
+        // FUNCIÓN PARA GENERAR EL INFORME PDF CON PESTAÑAS DESPLEGADAS
+        async function generarInformePDF() {
+            const { jsPDF } = window.jspdf;
+            const btn = document.getElementById('btnGenerarPDF');
+            
+            // Guardar el estado original y desplegar todos los paneles
+            const acordeones = document.querySelectorAll('.accordion');
+            const paneles = document.querySelectorAll('.panel');
+            const estadosOriginales = [];
+
+            acordeones.forEach((accItem, index) => {
+                const panel = paneles[index];
+                estadosOriginales.push(panel.style.display);
+                
+                panel.style.display = 'block';
+                accItem.classList.add('active');
+                accItem.innerText = accItem.innerText.replace("▶", "▼");
+            });
+
+            btn.innerText = "⏳ Generando PDF...";
+            btn.disabled = true;
+
+            // Esperar un instante a que el navegador aplique los cambios visuales
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            try {
+                const elemento = document.querySelector('.container');
+                const canvas = await html2canvas(elemento, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210; 
+                const pageHeight = 295; 
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save(`Informe_Cargas_${new Date().toISOString().slice(0,10)}.pdf`);
+
+            } catch (error) {
+                console.error("Error al generar el PDF:", error);
+                alert("Ocurrió un error al intentar generar el PDF.");
+            } finally {
+                // Restaurar estado previo de la interfaz
+                acordeones.forEach((accItem, index) => {
+                    const panel = paneles[index];
+                    panel.style.display = estadosOriginales[index];
+                    if (estadosOriginales[index] !== 'block') {
+                        accItem.classList.remove('active');
+                        accItem.innerText = accItem.innerText.replace("▼", "▶");
+                    }
+                });
+
+                btn.innerText = "📄 Generar Informe PDF";
+                btn.disabled = false;
+            }
         }
     </script>
 </body>
