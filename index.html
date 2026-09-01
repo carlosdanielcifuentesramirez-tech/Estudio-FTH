@@ -343,26 +343,53 @@
         }
 
         function dibujarFlecha(ctx, x, y, peso, etiqueta, color) {
-            ctx.fillStyle = color;
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 3;
-
-            // 1. Punto de origen (CG o Eje)
-            ctx.beginPath();
-            ctx.arc(x, y, 5, 0, 2 * Math.PI);
-            ctx.fill();
-
-            // 2. Línea vertical apuntando hacia abajo
             const largoLinea = 40;
             const yFin = y + largoLinea;
-            
+            const tamanoPunta = 8;
+
+            // --- 1. CAPA DE BORDE BLANCO ---
+            ctx.fillStyle = "white";
+            ctx.strokeStyle = "white";
+
+            // Borde de la línea vertical
+            ctx.lineWidth = 7;
             ctx.beginPath();
             ctx.moveTo(x, y);
             ctx.lineTo(x, yFin);
             ctx.stroke();
 
-            // 3. Punta de la flecha (Triángulo apuntando hacia abajo)
-            const tamanoPunta = 8;
+            // Borde del punto de origen
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Borde de la punta de la flecha
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(x, yFin + 6);
+            ctx.lineTo(x - (tamanoPunta + 2), yFin - (tamanoPunta + 1));
+            ctx.lineTo(x + (tamanoPunta + 2), yFin - (tamanoPunta + 1));
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fill();
+
+            // --- 2. CAPA PRINCIPAL (COLOR) ---
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+
+            // Punto de origen
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Línea vertical
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, yFin);
+            ctx.stroke();
+
+            // Punta de la flecha
             ctx.beginPath();
             ctx.moveTo(x, yFin + 4);
             ctx.lineTo(x - tamanoPunta, yFin - tamanoPunta);
@@ -370,7 +397,8 @@
             ctx.closePath();
             ctx.fill();
 
-            // 4. Etiqueta de texto superior (Nombre)
+            // --- 3. ETIQUETAS DE TEXTO ---
+            // Etiqueta superior (Nombre)
             ctx.fillStyle = "white";
             ctx.fillRect(x - 45, y - 22, 90, 18);
             ctx.fillStyle = color;
@@ -378,7 +406,7 @@
             ctx.textAlign = "center";
             ctx.fillText(etiqueta, x, y - 9);
 
-            // 5. Etiqueta de texto inferior (Valor en kg)
+            // Etiqueta inferior (Valor en kg)
             ctx.fillStyle = "white";
             ctx.fillRect(x - 35, yFin + 8, 70, 18);
             ctx.fillStyle = color;
