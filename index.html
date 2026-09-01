@@ -196,6 +196,19 @@
                 </div>
             </div>
 
+            <!-- NUEVO DESPLEGABLE: Ejes (Capacidades) -->
+            <button class="accordion">▶ Ejes (Capacidades) (kg)</button>
+            <div class="panel">
+                <div class="input-group">
+                    <label>Cap. Eje Delantero:</label>
+                    <input type="number" id="capacidad_eje_delantero" value="1750" min="1">
+                </div>
+                <div class="input-group">
+                    <label>Cap. Eje Trasero:</label>
+                    <input type="number" id="capacidad_eje_trasero" value="3000" min="1">
+                </div>
+            </div>
+
             <!-- Resultados en texto -->
             <div class="results-section" id="resultsText"></div>
         </div>
@@ -244,8 +257,6 @@
         const x2 = 591, y2 = 352;
         const peso_por_pasajero = 70;
         const cg_pasajeros = 1000;
-        const capacidad_delantero = 1750;
-        const capacidad_trasero = 3000;
 
         // POSICIONES DE TEXTO SOBRE "DIMENSIONES VAN"
         const POS_DIMENSIONES = {
@@ -266,7 +277,7 @@
         }
 
         function calcularYDibujar() {
-            // Leer valores
+            // Leer valores de dimensiones
             const longitud_total = parseFloat(document.getElementById('longitud_total').value) || 0;
             const longitud_cabina = parseFloat(document.getElementById('longitud_cabina').value) || 0;
             const alto_total = parseFloat(document.getElementById('alto_total').value) || 0;
@@ -277,10 +288,15 @@
             const longitud_bastidor = parseFloat(document.getElementById('longitud_sobre_bastidor').value) || 0;
             const alto_carroceria = parseFloat(document.getElementById('alto_carroceria').value) || 0;
 
+            // Leer valores de pasajeros, carga y carrocería
             const num_pasajeros = parseFloat(document.getElementById('numero_pasajeros').value) || 0;
             const carga = parseFloat(document.getElementById('carga').value) || 0;
             const peso_carr_del = parseFloat(document.getElementById('peso_carroceria_eje_delantero').value) || 0;
             const peso_carr_tras = parseFloat(document.getElementById('peso_carroceria_eje_trasero').value) || 0;
+
+            // Leer capacidades de ejes desde la interfaz
+            const capacidad_delantero = parseFloat(document.getElementById('capacidad_eje_delantero').value) || 1;
+            const capacidad_trasero = parseFloat(document.getElementById('capacidad_eje_trasero').value) || 1;
 
             // Cálculos
             const cg_carga = longitud_cabina - voladizo_ant + (longitud_bastidor / 2);
@@ -306,7 +322,7 @@
                 longitud_total, longitud_cabina, alto_total, ancho_total,
                 distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria
             });
-            mostrarResultadosTexto(longitud_total, longitud_cabina, alto_total, ancho_total, distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria, peso_carroceria, peso_carr_del, peso_carr_tras, cg_vehiculo, num_pasajeros, peso_pasajeros, peso_pas_del, peso_pas_tras, carga, cg_carga, peso_carga_del, peso_carga_tras, total_delantero, total_trasero, util_del, util_tras);
+            mostrarResultadosTexto(longitud_total, longitud_cabina, alto_total, ancho_total, distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria, peso_carroceria, peso_carr_del, peso_carr_tras, cg_vehiculo, num_pasajeros, peso_pasajeros, peso_pas_del, peso_pas_tras, carga, cg_carga, peso_carga_del, peso_carga_tras, total_delantero, total_trasero, util_del, util_tras, capacidad_delantero, capacidad_trasero);
         }
 
         function dibujarTextoRotado(ctx, texto, x, y) {
@@ -480,7 +496,7 @@
             dibujarGauge(ctx, 880, 260, 45, u_tras, "EJE TRASERO");
         }
 
-        function mostrarResultadosTexto(l_tot, l_cab, a_tot, anc_tot, d_ejes, v_ant, v_post, l_bast, a_carr, p_carr, p_del, p_tras, cg_veh, n_pas, p_pas, p_pas_del, p_pas_tras, carga, cg_carga, p_carg_del, p_carg_tras, t_del, t_tras, u_del, u_tras) {
+        function mostrarResultadosTexto(l_tot, l_cab, a_tot, anc_tot, d_ejes, v_ant, v_post, l_bast, a_carr, p_carr, p_del, p_tras, cg_veh, n_pas, p_pas, p_pas_del, p_pas_tras, carga, cg_carga, p_carg_del, p_carg_tras, t_del, t_tras, u_del, u_tras, cap_del, cap_tras) {
             document.getElementById('resultsText').innerHTML = `
                 <h3>DATOS Y RESULTADOS</h3>
                 <b>VEHÍCULO CARROZADO</b><br>
@@ -496,8 +512,8 @@
                 CG carga: <b>${cg_carga.toFixed(1)} mm</b><br>
 
                 <h3>EJES Y UTILIZACIÓN</h3>
-                Peso total eje delantero: <b>${t_del.toFixed(1)} kg</b> (${u_del.toFixed(1)}%)<br>
-                Peso total eje trasero: <b>${t_tras.toFixed(1)} kg</b> (${u_tras.toFixed(1)}%)
+                Eje Delantero: <b>${t_del.toFixed(1)} kg / ${cap_del} kg</b> (${u_del.toFixed(1)}%)<br>
+                Eje Trasero: <b>${t_tras.toFixed(1)} kg / ${cap_tras} kg</b> (${u_tras.toFixed(1)}%)
             `;
         }
     </script>
