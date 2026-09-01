@@ -178,9 +178,8 @@
             <button class="accordion">▶ Carga (kg)</button>
             <div class="panel">
                 <div class="input-group">
-                    <label>Carga:</label>
-                    <input type="range" id="carga" value="739" min="0" max="5000" step="10" oninput="this.nextElementSibling.value = this.value">
-                    <output>739</output> kg
+                    <label>Carga (kg):</label>
+                    <input type="number" id="carga" value="739" min="0" max="10000">
                 </div>
             </div>
 
@@ -240,7 +239,7 @@
             input.addEventListener('input', calcularYDibujar);
         });
 
-        // Coordenadas base para las ruedas/ejes (ajustadas al canvas proporcional)
+        // Coordenadas base para las ruedas/ejes
         const x1 = 164, y1 = 348;
         const x2 = 591, y2 = 352;
         const peso_por_pasajero = 70;
@@ -310,11 +309,10 @@
             mostrarResultadosTexto(longitud_total, longitud_cabina, alto_total, ancho_total, distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria, peso_carroceria, peso_carr_del, peso_carr_tras, cg_vehiculo, num_pasajeros, peso_pasajeros, peso_pas_del, peso_pas_tras, carga, cg_carga, peso_carga_del, peso_carga_tras, total_delantero, total_trasero, util_del, util_tras);
         }
 
-        // Función para dibujar texto rotado 90 grados a la izquierda (-90 deg)
         function dibujarTextoRotado(ctx, texto, x, y) {
             ctx.save();
             ctx.translate(x, y);
-            ctx.rotate(-Math.PI / 2); // Rotación de 90° a la izquierda
+            ctx.rotate(-Math.PI / 2);
             ctx.fillText(texto, 0, 0);
             ctx.restore();
         }
@@ -328,12 +326,10 @@
                 ctx.drawImage(dimImg, 0, 0, canvas.width, canvas.height);
             }
 
-            // Estilo para el texto dinámico
             ctx.font = "bold 12px Arial";
-            ctx.fillStyle = "#00008B"; // Azul oscuro corporativo
+            ctx.fillStyle = "#00008B";
             ctx.textAlign = "center";
 
-            // Dibujar cotas horizontales simples
             ctx.fillText(`${dims.longitud_total} mm`, POS_DIMENSIONES.longitud_total.x, POS_DIMENSIONES.longitud_total.y);
             ctx.fillText(`${dims.longitud_cabina} mm`, POS_DIMENSIONES.longitud_cabina.x, POS_DIMENSIONES.longitud_cabina.y);
             ctx.fillText(`${dims.ancho_total} mm`, POS_DIMENSIONES.ancho_total.x, POS_DIMENSIONES.ancho_total.y);
@@ -342,7 +338,6 @@
             ctx.fillText(`${dims.voladizo_post} mm`, POS_DIMENSIONES.voladizo_posterior.x, POS_DIMENSIONES.voladizo_posterior.y);
             ctx.fillText(`${dims.longitud_bastidor} mm`, POS_DIMENSIONES.longitud_bastidor.x, POS_DIMENSIONES.longitud_bastidor.y);
 
-            // Dibujar cotas verticales rotadas 90° a la izquierda
             dibujarTextoRotado(ctx, `${dims.alto_total} mm`, POS_DIMENSIONES.alto_total.x, POS_DIMENSIONES.alto_total.y);
             dibujarTextoRotado(ctx, `${dims.alto_carroceria} mm`, POS_DIMENSIONES.alto_carroceria.x, POS_DIMENSIONES.alto_carroceria.y);
         }
@@ -352,25 +347,21 @@
             ctx.strokeStyle = color;
             ctx.lineWidth = 3;
 
-            // Punto CG
             ctx.beginPath();
             ctx.arc(x, y, 6, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Línea
             ctx.beginPath();
             ctx.moveTo(x, y);
             ctx.lineTo(x, y + 45);
             ctx.stroke();
 
-            // Etiqueta arriba
             ctx.fillStyle = "white";
             ctx.fillRect(x - 40, y - 22, 80, 18);
             ctx.fillStyle = color;
             ctx.font = "bold 11px Arial";
             ctx.fillText(etiqueta, x - 32, y - 9);
 
-            // Etiqueta abajo (Peso)
             ctx.fillStyle = "white";
             ctx.fillRect(x - 30, y + 48, 60, 18);
             ctx.fillStyle = color;
@@ -421,7 +412,6 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (vanImg.complete && vanImg.naturalWidth !== 0) {
-                // Mantiene el aspect ratio original de la imagen
                 const maxAncho = 750;
                 const relacionAspecto = vanImg.naturalWidth / vanImg.naturalHeight;
                 const anchoDibujo = maxAncho;
@@ -434,7 +424,6 @@
             const x_carga = mmAPixelX(cg_carga, dist_ejes);
             const x_pas = mmAPixelX(cg_pasajeros, dist_ejes);
 
-            // Coordenadas de flechas adaptadas a la nueva escala vertical
             dibujarFlecha(ctx, x_veh, 160, p_carr, "CG Vehículo", "red");
             dibujarFlecha(ctx, x_pas, 200, p_pas, "CG Pasajeros", "blue");
             dibujarFlecha(ctx, x_carga, 175, carga, "CG Carga", "green");
