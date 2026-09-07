@@ -638,7 +638,8 @@
 
             ctx.font = "bold 15px Arial";
             ctx.fillStyle = valor >= 100 ? "red" : (valor >= 80 ? "green" : "#D9A900");
-            ctx.fillText(`${Math.round(valor)}%`, 0, 15);
+            // Formateado a 1 decimal
+            ctx.fillText(`${valor.toFixed(1)}%`, 0, 15);
 
             ctx.restore();
         }
@@ -668,7 +669,7 @@
             dibujarFlecha(ctx, x1, y1, t_del, "Eje Delantero", "black");
             dibujarFlecha(ctx, x2, y2, t_tras, "Eje Trasero", "black");
 
-            // Dibujar los 3 indicadores tipo Gauge verticalmente a la derecha
+            // Dibujar los 3 indicadores tipo Gauge verticalmente a la derecha con 1 decimal
             dibujarGauge(ctx, 880, 80, 40, u_del, "EJE DELANTERO");
             dibujarGauge(ctx, 880, 205, 40, u_tras, "EJE TRASERO");
             dibujarGauge(ctx, 880, 330, 40, u_pbv, "PBV");
