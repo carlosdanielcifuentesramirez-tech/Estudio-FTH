@@ -246,7 +246,7 @@
                 <canvas id="dimCanvas" width="800" height="320"></canvas>
             </div>
 
-            <!-- Diagrama dinámico con vectores (Abajo) -->
+            <!-- Diagrama dinámico con vectores y tres relojes (Abajo) -->
             <div class="canvas-container">
                 <canvas id="vanCanvas" width="1000" height="420"></canvas>
             </div>
@@ -316,12 +316,12 @@
                 <div class="input-group"><label>Alto carrocería:</label><input type="number" id="alto_carroceria" value="1930"></div>
             </div>
 
-            <!-- Desplegable PBV (NUEVA PESTAÑA SEGUNDA POSICIÓN) -->
+            <!-- Desplegable PBV -->
             <button class="accordion">▶ Peso Bruto Vehicular (PBV) (kg)</button>
             <div class="panel">
                 <div class="input-group">
                     <label>PBV (kg):</label>
-                    <input type="number" id="peso_bruto_vehicular" value="3500" min="0">
+                    <input type="number" id="peso_bruto_vehicular" value="3500" min="1">
                 </div>
             </div>
 
@@ -453,7 +453,7 @@
             const longitud_bastidor = parseFloat(document.getElementById('longitud_sobre_bastidor').value) || 0;
             const alto_carroceria = parseFloat(document.getElementById('alto_carroceria').value) || 0;
 
-            const pbv = parseFloat(document.getElementById('peso_bruto_vehicular').value) || 0;
+            const pbv = parseFloat(document.getElementById('peso_bruto_vehicular').value) || 1;
 
             const num_pasajeros = parseFloat(document.getElementById('numero_pasajeros').value) || 0;
             const carga = parseFloat(document.getElementById('carga').value) || 0;
@@ -476,11 +476,13 @@
 
             const total_delantero = peso_carr_del + peso_pas_del + peso_carga_del;
             const total_trasero = peso_carr_tras + peso_pas_tras + peso_carga_tras;
+            const total_general = total_delantero + total_trasero;
 
             const util_del = (total_delantero / capacidad_delantero) * 100;
             const util_tras = (total_trasero / capacidad_trasero) * 100;
+            const util_pbv = (total_general / pbv) * 100;
 
-            dibujarGraficaPesos(cg_vehiculo, cg_carga, distancia_ejes, peso_carroceria, peso_pasajeros, carga, total_delantero, total_trasero, util_del, util_tras);
+            dibujarGraficaPesos(cg_vehiculo, cg_carga, distancia_ejes, peso_carroceria, peso_pasajeros, carga, total_delantero, total_trasero, util_del, util_tras, util_pbv);
             dibujarDimensionesOverlay({
                 longitud_total, longitud_cabina, alto_total, ancho_total,
                 distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria
@@ -587,7 +589,7 @@
             ctx.closePath();
             ctx.fill();
 
-            // Fondo blanco superior para la etiqueta (ampliado para texto de 15px)
+            // Fondo blanco superior para la etiqueta
             ctx.fillStyle = "white";
             ctx.fillRect(x - 55, y - 28, 110, 24);
             ctx.fillStyle = color;
@@ -595,7 +597,7 @@
             ctx.textAlign = "center";
             ctx.fillText(etiqueta, x, y - 10);
 
-            // Fondo blanco inferior para el peso en kg (ampliado para texto de 15px)
+            // Fondo blanco inferior para el peso en kg
             ctx.fillStyle = "white";
             ctx.fillRect(x - 40, yFin + 8, 80, 24);
             ctx.fillStyle = color;
@@ -610,7 +612,7 @@
             const drawArc = (start, end, color) => {
                 ctx.beginPath();
                 ctx.arc(0, 0, radius, start, end);
-                ctx.lineWidth = 14;
+                ctx.lineWidth = 12;
                 ctx.strokeStyle = color;
                 ctx.stroke();
             };
@@ -630,18 +632,18 @@
             ctx.stroke();
 
             ctx.fillStyle = "#17365D";
-            ctx.font = "bold 12px Arial";
+            ctx.font = "bold 11px Arial";
             ctx.textAlign = "center";
-            ctx.fillText(titulo, 0, -radius - 12);
+            ctx.fillText(titulo, 0, -radius - 10);
 
-            ctx.font = "bold 16px Arial";
+            ctx.font = "bold 15px Arial";
             ctx.fillStyle = valor >= 100 ? "red" : (valor >= 80 ? "green" : "#D9A900");
             ctx.fillText(`${Math.round(valor)}%`, 0, 15);
 
             ctx.restore();
         }
 
-        function dibujarGraficaPesos(cg_veh, cg_carga, dist_ejes, p_carr, p_pas, carga, t_del, t_tras, u_del, u_tras) {
+        function dibujarGraficaPesos(cg_veh, cg_carga, dist_ejes, p_carr, p_pas, carga, t_del, t_tras, u_del, u_tras, u_pbv) {
             const canvas = document.getElementById('vanCanvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -666,8 +668,10 @@
             dibujarFlecha(ctx, x1, y1, t_del, "Eje Delantero", "black");
             dibujarFlecha(ctx, x2, y2, t_tras, "Eje Trasero", "black");
 
-            dibujarGauge(ctx, 880, 110, 45, u_del, "EJE DELANTERO");
-            dibujarGauge(ctx, 880, 260, 45, u_tras, "EJE TRASERO");
+            // Dibujar los 3 indicadores tipo Gauge verticalmente a la derecha
+            dibujarGauge(ctx, 880, 80, 40, u_del, "EJE DELANTERO");
+            dibujarGauge(ctx, 880, 205, 40, u_tras, "EJE TRASERO");
+            dibujarGauge(ctx, 880, 330, 40, u_pbv, "PBV");
         }
 
         function mostrarCentrosGravedad(cg_veh, cg_carga) {
