@@ -617,29 +617,50 @@
                 ctx.stroke();
             };
 
-            drawArc(Math.PI, Math.PI * 1.66, "#D9A900");
-            drawArc(Math.PI * 1.66, Math.PI * 1.83, "green");
-            drawArc(Math.PI * 1.83, Math.PI * 2, "red");
+            // Escala del reloj: De Math.PI (0%) a Math.PI * 2 (120%)
+            // 0% a 70% -> Amarillo (Precaución baja/normal)
+            // 70% a 100% -> Verde (Rango óptimo/máximo permitido)
+            // 100% a 120% -> Rojo (Sobrecarga)
+            drawArc(Math.PI, Math.PI * 1.583, "#D9A900");
+            drawArc(Math.PI * 1.583, Math.PI * 1.833, "#28a745");
+            drawArc(Math.PI * 1.833, Math.PI * 2, "#dc3545");
 
+            // Mapeo del valor a la escala (máximo gráfico en 120%)
             const valLim = Math.max(0, Math.min(valor, 120));
             const angle = Math.PI + (valLim / 120) * Math.PI;
 
+            // Determinar color de aguja y texto
+            let colorEstado = "#28a745"; // Verde
+            if (valor > 100) {
+                colorEstado = "#dc3545"; // Rojo por sobrecarga
+            } else if (valor < 70) {
+                colorEstado = "#D9A900"; // Amarillo
+            }
+
+            // Aguja del reloj
             ctx.beginPath();
             ctx.moveTo(0, 0);
-            ctx.lineTo(Math.cos(angle) * (radius - 10), Math.sin(angle) * (radius - 10));
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = "#000";
+            ctx.lineTo(Math.cos(angle) * (radius - 8), Math.sin(angle) * (radius - 8));
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = colorEstado;
             ctx.stroke();
 
+            // Centro de la aguja
+            ctx.beginPath();
+            ctx.arc(0, 0, 4, 0, 2 * Math.PI);
+            ctx.fillStyle = colorEstado;
+            ctx.fill();
+
+            // Título
             ctx.fillStyle = "#17365D";
             ctx.font = "bold 11px Arial";
             ctx.textAlign = "center";
             ctx.fillText(titulo, 0, -radius - 10);
 
+            // Porcentaje formateado con 1 decimal
             ctx.font = "bold 15px Arial";
-            ctx.fillStyle = valor >= 100 ? "red" : (valor >= 80 ? "green" : "#D9A900");
-            // Formateado a 1 decimal
-            ctx.fillText(`${valor.toFixed(1)}%`, 0, 15);
+            ctx.fillStyle = colorEstado;
+            ctx.fillText(`${valor.toFixed(1)}%`, 0, 18);
 
             ctx.restore();
         }
