@@ -302,7 +302,7 @@
 
             <h3 style="color: #17365D; margin-top:0;">PARÁMETROS DEL VEHÍCULO</h3>
 
-            <!-- Desplegable Dimensiones -->
+            <!-- 1. Desplegable Dimensiones -->
             <button class="accordion">▶ Dimensiones del vehículo (mm)</button>
             <div class="panel">
                 <div class="input-group"><label>Longitud total:</label><input type="number" id="longitud_total" value="5990"></div>
@@ -316,7 +316,7 @@
                 <div class="input-group"><label>Alto carrocería:</label><input type="number" id="alto_carroceria" value="1930"></div>
             </div>
 
-            <!-- Desplegable PBV -->
+            <!-- 2. Desplegable PBV -->
             <button class="accordion">▶ Peso Bruto Vehicular (PBV) (kg)</button>
             <div class="panel">
                 <div class="input-group">
@@ -325,29 +325,7 @@
                 </div>
             </div>
 
-            <!-- Desplegable Pasajeros -->
-            <button class="accordion">▶ Pasajeros</button>
-            <div class="panel">
-                <div class="input-group">
-                    <label>Nº Pasajeros:</label>
-                    <input type="number" id="numero_pasajeros" value="2" min="0" max="20">
-                </div>
-            </div>
-
-            <!-- Desplegable Carrocería -->
-            <button class="accordion">▶ Pesos Carrocería (kg)</button>
-            <div class="panel">
-                <div class="input-group">
-                    <label>Eje delantero:</label>
-                    <input type="number" id="peso_carroceria_eje_delantero" value="1395">
-                </div>
-                <div class="input-group">
-                    <label>Eje trasero:</label>
-                    <input type="number" id="peso_carroceria_eje_trasero" value="1155">
-                </div>
-            </div>
-
-            <!-- Desplegable Ejes (Capacidades) -->
+            <!-- 3. Desplegable Ejes (Capacidades) -->
             <button class="accordion">▶ Ejes (Capacidades) (kg)</button>
             <div class="panel">
                 <div class="input-group">
@@ -360,7 +338,29 @@
                 </div>
             </div>
 
-            <!-- Desplegable Carga -->
+            <!-- 4. Desplegable Carrocería -->
+            <button class="accordion">▶ Pesos Carrocería (kg)</button>
+            <div class="panel">
+                <div class="input-group">
+                    <label>Eje delantero:</label>
+                    <input type="number" id="peso_carroceria_eje_delantero" value="1395">
+                </div>
+                <div class="input-group">
+                    <label>Eje trasero:</label>
+                    <input type="number" id="peso_carroceria_eje_trasero" value="1155">
+                </div>
+            </div>
+
+            <!-- 5. Desplegable Pasajeros -->
+            <button class="accordion">▶ Pasajeros</button>
+            <div class="panel">
+                <div class="input-group">
+                    <label>Nº Pasajeros:</label>
+                    <input type="number" id="numero_pasajeros" value="2" min="0" max="20">
+                </div>
+            </div>
+
+            <!-- 6. Desplegable Carga -->
             <button class="accordion">▶ Carga (kg)</button>
             <div class="panel">
                 <div class="input-group">
@@ -617,19 +617,13 @@
                 ctx.stroke();
             };
 
-            // Escala del reloj: De Math.PI (0%) a Math.PI * 2 (120%)
-            // 0% a 70% -> Amarillo (Precaución baja/normal)
-            // 70% a 100% -> Verde (Rango óptimo/máximo permitido)
-            // 100% a 120% -> Rojo (Sobrecarga)
             drawArc(Math.PI, Math.PI * 1.583, "#D9A900");
             drawArc(Math.PI * 1.583, Math.PI * 1.833, "#28a745");
             drawArc(Math.PI * 1.833, Math.PI * 2, "#dc3545");
 
-            // Mapeo del valor a la escala (máximo gráfico en 120%)
             const valLim = Math.max(0, Math.min(valor, 120));
             const angle = Math.PI + (valLim / 120) * Math.PI;
 
-            // Determinar color de aguja y texto
             let colorEstado = "#28a745"; // Verde
             if (valor > 100) {
                 colorEstado = "#dc3545"; // Rojo por sobrecarga
@@ -637,7 +631,6 @@
                 colorEstado = "#D9A900"; // Amarillo
             }
 
-            // Aguja del reloj
             ctx.beginPath();
             ctx.moveTo(0, 0);
             ctx.lineTo(Math.cos(angle) * (radius - 8), Math.sin(angle) * (radius - 8));
@@ -645,19 +638,16 @@
             ctx.strokeStyle = colorEstado;
             ctx.stroke();
 
-            // Centro de la aguja
             ctx.beginPath();
             ctx.arc(0, 0, 4, 0, 2 * Math.PI);
             ctx.fillStyle = colorEstado;
             ctx.fill();
 
-            // Título
             ctx.fillStyle = "#17365D";
             ctx.font = "bold 11px Arial";
             ctx.textAlign = "center";
             ctx.fillText(titulo, 0, -radius - 10);
 
-            // Porcentaje formateado con 1 decimal
             ctx.font = "bold 15px Arial";
             ctx.fillStyle = colorEstado;
             ctx.fillText(`${valor.toFixed(1)}%`, 0, 18);
@@ -690,7 +680,6 @@
             dibujarFlecha(ctx, x1, y1, t_del, "Eje Delantero", "black");
             dibujarFlecha(ctx, x2, y2, t_tras, "Eje Trasero", "black");
 
-            // Dibujar los 3 indicadores tipo Gauge verticalmente a la derecha con 1 decimal
             dibujarGauge(ctx, 880, 80, 40, u_del, "EJE DELANTERO");
             dibujarGauge(ctx, 880, 205, 40, u_tras, "EJE TRASERO");
             dibujarGauge(ctx, 880, 330, 40, u_pbv, "PBV");
@@ -708,7 +697,6 @@
         async function generarInformePDF() {
             const nombreVehiculo = document.getElementById('nombre_vehiculo').value.trim();
 
-            // Validación de campo obligatorio
             if (!nombreVehiculo) {
                 alert("Por favor ingrese la Referencia");
                 document.getElementById('nombre_vehiculo').focus();
@@ -718,7 +706,6 @@
             const { jsPDF } = window.jspdf;
             const btn = document.getElementById('btnGuardarResultados');
             
-            // Guardar estado original y desplegar acordeones
             const acordeones = document.querySelectorAll('.accordion');
             const paneles = document.querySelectorAll('.panel');
             const estadosOriginales = [];
@@ -763,7 +750,6 @@
                     heightLeft -= pageHeight;
                 }
 
-                // Generar nombre de archivo dinámico
                 const nombreLimpio = nombreVehiculo.replace(/[^a-zA-Z0-9_-]/g, "_");
                 pdf.save(`Informe_${nombreLimpio}_${new Date().toISOString().slice(0,10)}.pdf`);
 
@@ -771,7 +757,6 @@
                 console.error("Error al generar el PDF:", error);
                 alert("Ocurrió un error al intentar guardar los resultados.");
             } finally {
-                // Restaurar estado de acordeones
                 acordeones.forEach((accItem, index) => {
                     const panel = paneles[index];
                     panel.style.display = estadosOriginales[index];
