@@ -358,6 +358,10 @@
                     <label>Nº Pasajeros:</label>
                     <input type="number" id="numero_pasajeros" value="3" min="0" max="20">
                 </div>
+                <div class="input-group">
+                    <label>CG Pasajeros (mm):</label>
+                    <input type="number" id="cg_pasajeros" value="1000">
+                </div>
             </div>
 
             <!-- 6. Desplegable Carga -->
@@ -423,7 +427,6 @@
         const x1 = 164, y1 = 348;
         const x2 = 591, y2 = 352;
         const peso_por_pasajero = 70;
-        const cg_pasajeros = 1000;
 
         const POS_DIMENSIONES = {
             longitud_total: { x: 485, y: 299 },
@@ -456,6 +459,8 @@
             const pbv = parseFloat(document.getElementById('peso_bruto_vehicular').value) || 1;
 
             const num_pasajeros = parseFloat(document.getElementById('numero_pasajeros').value) || 0;
+            const cg_pasajeros = parseFloat(document.getElementById('cg_pasajeros').value) || 0;
+
             const carga = parseFloat(document.getElementById('carga').value) || 0;
             const peso_carr_del = parseFloat(document.getElementById('peso_carroceria_eje_delantero').value) || 0;
             const peso_carr_tras = parseFloat(document.getElementById('peso_carroceria_eje_trasero').value) || 0;
@@ -482,13 +487,13 @@
             const util_tras = (total_trasero / capacidad_trasero) * 100;
             const util_pbv = (total_general / pbv) * 100;
 
-            dibujarGraficaPesos(cg_vehiculo, cg_carga, distancia_ejes, peso_carroceria, peso_pasajeros, carga, total_delantero, total_trasero, util_del, util_tras, util_pbv);
+            dibujarGraficaPesos(cg_vehiculo, cg_carga, cg_pasajeros, distancia_ejes, peso_carroceria, peso_pasajeros, carga, total_delantero, total_trasero, util_del, util_tras, util_pbv);
             dibujarDimensionesOverlay({
                 longitud_total, longitud_cabina, alto_total, ancho_total,
                 distancia_ejes, voladizo_ant, voladizo_post, longitud_bastidor, alto_carroceria
             });
             actualizarTablaResumen(peso_carr_del, peso_carr_tras, peso_carroceria, peso_carga_del, peso_carga_tras, carga, peso_pas_del, peso_pas_tras, peso_pasajeros, total_delantero, total_trasero);
-            mostrarCentrosGravedad(cg_vehiculo, cg_carga);
+            mostrarCentrosGravedad(cg_vehiculo, cg_carga, cg_pasajeros);
         }
 
         function actualizarTablaResumen(vDel, vTras, vTot, cDel, cTras, cTot, pDel, pTras, pTot, tDel, tTras) {
@@ -655,7 +660,7 @@
             ctx.restore();
         }
 
-        function dibujarGraficaPesos(cg_veh, cg_carga, dist_ejes, p_carr, p_pas, carga, t_del, t_tras, u_del, u_tras, u_pbv) {
+        function dibujarGraficaPesos(cg_veh, cg_carga, cg_pas, dist_ejes, p_carr, p_pas, carga, t_del, t_tras, u_del, u_tras, u_pbv) {
             const canvas = document.getElementById('vanCanvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -671,7 +676,7 @@
 
             const x_veh = mmAPixelX(cg_veh, dist_ejes);
             const x_carga = mmAPixelX(cg_carga, dist_ejes);
-            const x_pas = mmAPixelX(cg_pasajeros, dist_ejes);
+            const x_pas = mmAPixelX(cg_pas, dist_ejes);
 
             dibujarFlecha(ctx, x_veh, 160, p_carr, "CG Vehículo", "red");
             dibujarFlecha(ctx, x_pas, 200, p_pas, "CG Pasajeros", "blue");
@@ -685,10 +690,11 @@
             dibujarGauge(ctx, 880, 330, 40, u_pbv, "PBV");
         }
 
-        function mostrarCentrosGravedad(cg_veh, cg_carga) {
+        function mostrarCentrosGravedad(cg_veh, cg_carga, cg_pas) {
             document.getElementById('cgSection').innerHTML = `
                 <h3>CENTROS DE GRAVEDAD</h3>
                 CG vehículo carrozado: <b>${cg_veh.toFixed(1)} mm</b><br>
+                CG pasajeros: <b>${cg_pas.toFixed(1)} mm</b><br>
                 CG carga: <b>${cg_carga.toFixed(1)} mm</b>
             `;
         }
